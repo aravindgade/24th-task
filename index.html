@@ -1,0 +1,204 @@
+<html>
+<head>
+    <link rel="stylesheet" href="style.css">
+    <title>Chapter 12</title>
+    </head>
+<body>
+    
+    <div style="width: 100%;height: 5px;background-color: black;"></div>
+    <br>
+    
+    <h2>Chapter 12. Using the Topology Server Command Exits</h2>
+    <br>
+    <p>This chapter contains Programming Interface information.</p>
+    <br>
+    <p>This chapter contains information about topology server command exits. The command exit facility enables commands defined in the context menus for selected resources to call specific functions when those commands are selected. These specific functions are known as command exits and are processed as remote procedure calls. When a command is selected, its corresponding command exit procedure is driven by the topology server.</p>
+    
+    <br>
+    
+    <div class="underline"></div>
+    <h3>Command Profiles</h3>
+    <br>
+    
+    <p>Command profiles define the commands available from the context menus for a particular operator. When an operator right-clicks a resource or the view background, the command profile for that operator is used if it exists; otherwise, the default command profile is used.</p>
+    
+    <br>
+    
+    <p>Command profiles define the commands available from the context menus for a particular operator. When an operator right-clicks a resource or the view background, the command profile for that operator is used if it exists; otherwise, the default command profile is used.</p>
+    
+    <br>
+    
+    <div class="underline"></div>
+    
+    <br>
+    
+    <h3>Understanding Topology Server Command Exits</h3>
+    
+    <br><br>
+    
+    <p>The topology server provides a set of command exits to send commands from the workstation to the NetView host as described in “Using Topology Server Command Exits” on page 104. The command exit facility supports exit-to-exit communication, which enables a command exit to modify a command and to pass the data to another command exit for processing.</p>
+    
+    <br>
+    
+    <p>When a command exit returns, control is given to its caller. Eventually, the first exit called by the command selection returns.</p>
+    
+    <br>
+    
+    <p><i>Note:</i> Some events take place when a command exit is driven. If an exit procedure is not yet registered, then an executable file with the same file name as the exit name is sought using the defined path. If found, this executable file is started in a separate session.</p>
+    
+    <p>
+For example, if the exit is called TESTEXIT, the topology server searches for and starts the TESTEXIT.EXE (for Windows platforms) or TESTEXIT (for AIX or Linux platforms). This program registers a procedure within itself as a command exit procedure.</p>
+    
+    <p>When a command is issued from the topology console, the command exit indicated in the command profile is driven by the topology server. For a resource dependent command, the command exit that is driven is based on the command indicator of the resource. A parameter block is passed to the command exit procedure containing information about the command in the command profile editor and information about a resource (if selected) when the command was called. The command exit procedure can pass a return code to its caller when processing of
+the command is complete.</p>
+    
+    <br><br><br>
+    
+    <div style="width: 100%;height: 5px;background-color: black;"></div>
+    <h3>Using Topology Server Command Exits</h3>
+    
+    <p>The command exits that are supplied with the topology server for general use are shown in Table 43.</p>
+    
+    <p><i>Table 43. Command exits supplied by the topology server</i></p>
+    
+    <center>
+    <img src="Screenshot%20(406).png">
+    </center>
+    
+    <h3>IHSDGENE Command Exit</h3>
+    
+    <p>For resources managed by GMFHS and MultiSystem Manager (MSM), use the IHSDGENE exit to send a fixed set of generic commands to NetView GMFHS for processing. Examples of the generic commands you can send include<b>Activate, Inactivate, and Recycle.</b> This exit supports only the commands listed in the default command profile and cannot be extended. To determine the commands supported by this exit and their syntax, look at the default command profile shipped with the topology server as defined in the ihsscpe<i>.xxx.</i>rsp and flccpe<i>.xxx.</i>rsp response files, where xxx is a country code indicator, such as <i>en_US.</i></p>
+    
+    <p>Note that you do not have to define the generic commands to the command profile editor as they are already defined in the response file.</p>
+    
+    <p>For more information, <i>see the IBM Tivoli NetView for z/OS Resource Object Data Manager and GMFHS Programmer's Guide.</i></p>
+    <br>
+    
+    <h3>IHSDNATV Command Exit</h3>
+
+    <p>IHSDNATV is used to send a command to GMFHS, which forwards the command to the service point for the specified resource. A resource must be selected before IHSDNATV is called.</p>
+    
+    <p>When defining a command that uses this exit, specify the following information in the Commands notebook.</p>
+    
+    <p>1.	In the Command string field, specify the command to send to a network management gateway that manages the selected resource. GMFHS performs substitution for the following symbols in the command string:</p>
+    
+    <br><br><br>
+    
+    
+    <h4><i>%appl%</i></h4>
+    
+    <p>Substitutes the value of the TransactionProgram field of the Non_SNA_Domain_Class instance.</p>
+    
+    <h4><i>%domain%</i></h4>
+    
+    <p>Substitutes the value of the EMDomain field of the Non_SNA_Domain_Class instance.</p>
+
+    <h4>%resource%</h4>
+    
+    <p>Substitutes the resource name portion of the MyName field of the GMFHS_Managed_Real_Objects_Class or a subclass of the GMFHS_Managed_Real_Objects_Class instance.</p>
+    
+    <p>For example, (EMDomain.Resource = SPI6E69.MINI69A) causes MINI69A to be substituted.</p>
+    
+    <h4><i>%spname%</i></h4>
+    
+    <p>Substitutes the value of the MyName field of the NMG_Class instance.</p>
+    
+    <h4><i>%type%</i></h4>
+    
+    <p> Substitutes the value of the TypeName field of the Display_Resource_Type_Class instance associated with a resource.</p>
+    
+    <p>2.	In the Exit name field, enter IHSDNATV.</p>
+    
+    
+    <h3>IHSXTHCE Command Exit</h3>
+    
+    <p>IHSXTHCE sends a command to the NetView host. If a resource is not selected when the command is called, IHSXTHCE can send resource-independent commands to the NetView host. If a resource is selected, the IHSXTHCE command exit can substitute resource specific information.</p>
+    
+    <p>When defining a command that uses this exit, specify the following information in the Commands notebook:</p>
+    
+    <p>1.	In the Command string field, specify the command to run on the NetView for z/OS program. If you selected Resource dependent, you can optionally specify substitution variables in the Command string field. See “Substitution Variables” on page 106 for a list of valid substitution variables.</p>
+    
+    <p>2.	In the Exit name field, enter IHSXTHCE.</p>
+    
+    <p>The following substitution variables are unique to the IHSXTHCE command exit:</p>
+    
+    <h4><i>%network%</i></h4>
+    
+    <p>Valid only for SNA topology manager Resource Object Data Manager (RODM) resources with command indicator values of 32769 and 32770. Substitutes the data before the first period in the display name, if it exists.</p>
+
+    <p>The display name is the resource name assigned by the manager of the resource and is the name that is displayed in the view. For RODM resources, this data is from the DisplayResourceName field.</p>
+
+    
+    <h4><i>%noresponse%</i></h4>
+    
+    <p>Directs the command response back to the NetView session.</p>
+    
+    <h4><i>%resource%</i></h4>
+    
+    <p>Valid only for SNA topology manager RODM resources with command indicator values of 32769 and 32770. Substitutes the data after the last period in the display name.</p>
+    
+    <p>The display name is the resource name assigned by the manager of the resource and is the name that is displayed in the view. For RODM resources, this data is from the DisplayResourceName field.</p>
+    
+    
+    <br><br><br>
+    
+    <h4><i>%response%</i></h4>
+    <p>Directs the command response back to the topology console.</p>
+    
+    <h2>IHSXTJAM Command Exit</h2>
+    
+    <p>The IHSXTJAM command exit starts a Java class on the topology console. The Java class name to be started must be the first blank delimited token in the command string field. Unlike the IHSXTJAV command exit, the IHSXTJAM command exit launches only one instance of the Java class when several resources are selected on the topology console. Thus, one instance of the Java class has access to information about every selected resource. The IHSXTJAM command exit can be specified in a resource independent or a resource dependent command. See Chapter 5, “Topology Console Java Applications and Plug-ins,” on page 35 for information about installing this Java class.</p>
+    
+    <h2>IHSXTJAV Command Exit</h2>
+
+    <p>The IHSXTJAV command exit starts a Java class on the topology console. The Java class name to be started must be the first blank delimited token in the command string field. Unlike the IHSXTJAM command exit, the IHSXTJAV command exit launches multiple instances of the Java class, when several resources are selected on the topology console. For example, when two resources are selected, and a command is selected that calls the IHSXTJAV command exit, two instances of the class specified in the command string launched are on the topology console, with each instance of the Java class having information about one of the selected resources. The IHSXTJAV command exit can be specified in a resource independent or a resource dependent command. See Chapter 5, “Topology Console Java Applications and Plug-ins,” on page 35 for information about installing this Java class.</p>
+    
+    <h2>Substitution Variables</h2>
+    
+    <p>Table 44 lists the common variables that are substituted by the topology server in the command string for the command exits. Note that the substitution variables are not case-sensitive. These variables are common across all command exits.</p>
+
+    <p><i>Table 44. Common substitution variables</i></p>
+    
+    <img src="Screenshot%20(407).png">
+    
+       
+    <p><i>Table 44. Common substitution variables (continued)</i></p>
+    
+
+    <img src="Screenshot%20(411).png">
+    
+    <h3>%REMOTECONSOLE%</h3>
+    
+    <p>The %REMOTECONSOLE% command-line substitution variable applies only to RODM resources. The value for %REMOTECONSOLE% comes from the resource specific data2 value, which comes from the DisplayResourceUserData field in RODM. This substitution variable calls a command or application on the topology console workstation.</p>
+    
+    <br><br><br>
+    
+    <p>For an example of how this substitution variable works with the Command Profile Editor and the topology console, see the command definition for Run Data2 Command in the %BINDIR%\TDS\server\sample\ihsscpe.xxx.rsp, where xxx is the country code, such as en_US. If syntax RemoteConsole=/(can be anything)/ exists in the resource specific data2 value, then %REMOTECONSOLE% is substituted using the following rules:</p>
+    
+    <p>v Syntax: "RemoteConsole = /the_command the_args(0-n)/"</p>
+    
+    <p>v Fixed portions of this syntax are not case sensitive (such as RemoteConsole).</p>
+    
+    <p>v Spaces around the equals sign are optional.</p>
+    
+    <p>v  Spaces between the first delimiter and the the_command are optional.</p>
+    
+    <p>v The delimiter / can be any character. The first nonblank character after the equals sign becomes the delimiter.</p>
+
+    <p>v A second occurrence of the delimiter character must exist after the first occurrence.</p>
+
+    <p>v There must be a nonblank character between the delimiters.</p>
+    
+    <p>v The command is assumed to be a valid command on any topology console workstation that runs this menu item. To map a command to an appropriate command for the platform of the topology console workstation, update the usercmdinv.properties file on the console. See Chapter 6, “Configuring Property Files for Locally Launched Applications,” on page 45 for more information.</p>
+    
+    <p>v This syntax can occur anywhere inside the resource specific data2 value; that is, other characters can come before or after this syntax.</p>
+    
+    <p>The %REMOTECONSOLE% substitution variable is converted to the following string:</p>
+    
+    <p>the_command d2cmdargs="the_arg1 the_arg2 the_arg3"</p>
+    
+    <p>The fixed characters are d2cmdargs=" and the second double quotation mark after the last arg. All other values are obtained from between the two delimiters.</p>
+    
+    
+    </body>
+</html>
